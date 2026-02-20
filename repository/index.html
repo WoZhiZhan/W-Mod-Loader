@@ -2,21 +2,392 @@
 <html lang="zh-CN">
 <head>
   <meta charset="UTF-8">
-  <title>W-Loader Maven Repo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>W-Loader · Maven 仓库</title>
+  <!-- 引入优雅的 Inter 字体，同时保留备用字体栈 -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600&display=swap" rel="stylesheet">
+  <!-- Font Awesome 6 (免费图标库) 用于增加视觉细节 -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
-    body { font-family: sans-serif; background: #f4f4f4; padding: 20px; }
-    h1 { color: #333; }
-    a { color: #0366d6; text-decoration: none; }
-    a:hover { text-decoration: underline; }
-    ul { line-height: 1.6; }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+      background: linear-gradient(145deg, #0b0f17 0%, #1a1f2e 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      margin: 0;
+      color: #eef2fb;
+      line-height: 1.5;
+    }
+
+    /* 磨砂玻璃质感的主卡片 */
+    .glass-repo {
+      background: rgba(20, 25, 40, 0.7);
+      backdrop-filter: blur(12px) saturate(180%);
+      -webkit-backdrop-filter: blur(12px) saturate(180%);
+      border-radius: 2.5rem;
+      border: 1px solid rgba(100, 130, 200, 0.15);
+      box-shadow: 0 30px 50px -20px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(160, 190, 255, 0.1) inset;
+      width: 100%;
+      max-width: 850px;
+      padding: 2.8rem 3rem;
+      transition: transform 0.2s ease, box-shadow 0.3s ease;
+    }
+
+    .glass-repo:hover {
+      box-shadow: 0 35px 60px -20px #030613, 0 0 0 1px rgba(200, 220, 255, 0.25) inset;
+    }
+
+    /* 标头区域 */
+    .repo-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1.8rem;
+      border-bottom: 1px solid rgba(160, 188, 255, 0.2);
+      padding-bottom: 1.5rem;
+    }
+
+    .repo-icon {
+      background: linear-gradient(135deg, #4e6af0, #9b87f5);
+      width: 56px;
+      height: 56px;
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 12px 18px -8px rgba(70, 100, 230, 0.4);
+    }
+
+    .repo-icon i {
+      font-size: 2.2rem;
+      color: white;
+      filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.3));
+    }
+
+    .repo-title h1 {
+      font-weight: 600;
+      font-size: 2.3rem;
+      letter-spacing: -0.02em;
+      background: linear-gradient(to right, #ffffff, #cdd9ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      line-height: 1.2;
+    }
+
+    .repo-title .tagline {
+      font-size: 0.95rem;
+      font-weight: 400;
+      color: #a3b3de;
+      margin-top: 0.2rem;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .repo-title .tagline i {
+      font-size: 0.8rem;
+      color: #5f7bcd;
+    }
+
+    /* 欢迎信息 & 介绍 */
+    .welcome-message {
+      background: rgba(12, 18, 30, 0.6);
+      border-radius: 1.5rem;
+      padding: 1.3rem 1.8rem;
+      margin-bottom: 2.5rem;
+      border: 1px solid rgba(110, 145, 230, 0.2);
+      backdrop-filter: blur(4px);
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+      flex-wrap: wrap;
+    }
+
+    .welcome-message i {
+      font-size: 1.8rem;
+      color: #6f8df2;
+      opacity: 0.9;
+    }
+
+    .welcome-message p {
+      flex: 1;
+      color: #d3defa;
+    }
+
+    .welcome-message p strong {
+      color: white;
+      font-weight: 600;
+    }
+
+    /* 模块列表卡片区域 */
+    .section-label {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-size: 0.85rem;
+      color: #8fa3dd;
+      margin-bottom: 1.2rem;
+    }
+
+    .section-label i {
+      font-size: 1rem;
+      color: #6382e0;
+    }
+
+    .module-grid {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .module-item {
+      display: block;
+      border-radius: 1.2rem;
+      background: rgba(18, 24, 40, 0.6);
+      border: 1px solid rgba(80, 120, 220, 0.2);
+      transition: all 0.2s ease;
+      backdrop-filter: blur(4px);
+    }
+
+    .module-item:hover {
+      background: rgba(30, 40, 65, 0.8);
+      border-color: rgba(140, 175, 255, 0.5);
+      transform: translateX(8px) scale(1.01);
+      box-shadow: 0 8px 18px -10px #040813;
+    }
+
+    .module-link {
+      display: flex;
+      align-items: center;
+      padding: 1rem 1.5rem;
+      text-decoration: none;
+      color: inherit;
+      gap: 1.2rem;
+    }
+
+    .module-icon {
+      background: rgba(70, 100, 220, 0.2);
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid rgba(120, 160, 255, 0.3);
+    }
+
+    .module-icon i {
+      font-size: 1.6rem;
+      color: #b7ccff;
+    }
+
+    .module-info {
+      flex: 1;
+    }
+
+    .module-name {
+      font-size: 1.3rem;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: white;
+      margin-bottom: 0.15rem;
+    }
+
+    .module-path {
+      font-family: 'Monaco', 'Menlo', 'Cascadia Code', monospace;
+      font-size: 0.85rem;
+      color: #8da4ef;
+      background: rgba(0, 0, 0, 0.2);
+      padding: 0.2rem 0.8rem;
+      border-radius: 30px;
+      display: inline-block;
+      border: 1px solid rgba(200, 220, 255, 0.1);
+    }
+
+    .module-arrow {
+      color: #506fd0;
+      font-size: 1.2rem;
+      opacity: 0.7;
+      transition: 0.2s;
+    }
+
+    .module-item:hover .module-arrow {
+      opacity: 1;
+      transform: translateX(4px);
+      color: #a6c1ff;
+    }
+
+    /* 额外的链接与 footer */
+    .repo-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid rgba(160, 188, 255, 0.15);
+    }
+
+    .github-card {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.9rem;
+      background: rgba(0, 0, 0, 0.3);
+      padding: 0.7rem 1.4rem 0.7rem 1.2rem;
+      border-radius: 3rem;
+      border: 1px solid rgba(200, 220, 255, 0.15);
+      transition: background 0.2s, border-color 0.2s;
+      backdrop-filter: blur(4px);
+    }
+
+    .github-card:hover {
+      background: #1e263f;
+      border-color: #5f7ee0;
+    }
+
+    .github-card i {
+      font-size: 1.8rem;
+      color: #d0d9ff;
+    }
+
+    .github-card span {
+      font-weight: 500;
+      color: white;
+    }
+
+    .github-card small {
+      color: #98afe5;
+      font-size: 0.9rem;
+    }
+
+    .footer-note {
+      color: #7989bc;
+      font-size: 0.9rem;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .footer-note i {
+      color: #506fd0;
+    }
+
+    /* 响应式调整 */
+    @media (max-width: 600px) {
+      .glass-repo {
+        padding: 2rem 1.5rem;
+      }
+      .repo-title h1 {
+        font-size: 1.8rem;
+      }
+      .module-link {
+        padding: 0.9rem 1rem;
+        flex-wrap: wrap;
+      }
+      .module-info {
+        min-width: 160px;
+      }
+      .repo-footer {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+      }
+    }
+
+    /* 自定义点缀 */
+    .glow-dot {
+      width: 8px;
+      height: 8px;
+      background: #6d8aff;
+      border-radius: 50%;
+      box-shadow: 0 0 10px #6d8aff;
+      display: inline-block;
+      margin-right: 6px;
+    }
   </style>
 </head>
 <body>
-  <h1>W-Loader Maven Repository</h1>
-  <p>欢迎访问 W-Loader Maven 仓库，点击下面的链接浏览各模块：</p>
-  <ul>
-    <li><a href="com/wzz/w-loader-api/">w-loader-api</a></li>
-  </ul>
-  <p>更多信息请访问 <a href="https://github.com/WoZhiZhan/W-Mod-Loader">GitHub 仓库</a></p>
+  <div class="glass-repo">
+    <!-- 头部区域 带图标和标题 -->
+    <div class="repo-header">
+      <div class="repo-icon">
+        <i class="fas fa-cubes"></i> <!-- 仓库/模块图标 -->
+      </div>
+      <div class="repo-title">
+        <h1>W-Loader Maven</h1>
+        <div class="tagline">
+          <i class="fas fa-map-pin"></i>
+          <span>central repository &nbsp;•&nbsp; <span class="glow-dot"></span> 可信构件</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 简洁的欢迎描述，保留原有语义并添加趣味 -->
+    <div class="welcome-message">
+      <i class="fas fa-hand-wave"></i>
+      <p><strong>欢迎使用 W-Loader Maven 仓库</strong> · 浏览下方的模块即可快速引入依赖。所有构件均经过校验，与 <i class="fas fa-code-branch" style="margin:0 3px;"></i> GitHub 保持同步。</p>
+    </div>
+
+    <!-- 模块列表区域 (目前仅一个, 但保留扩展感) -->
+    <div class="section-label">
+      <i class="fas fa-layer-group"></i>
+      <span>AVAILABLE MODULES</span>
+    </div>
+    
+    <ul class="module-grid">
+      <!-- w-loader-api 模块 - 使用更生动的展示 -->
+      <li class="module-item">
+        <a href="com/wzz/w-loader-api/" class="module-link">
+          <div class="module-icon">
+            <i class="fas fa-box"></i>
+          </div>
+          <div class="module-info">
+            <div class="module-name">w-loader-api</div>
+            <span class="module-path">com/wzz/w-loader-api/</span>
+          </div>
+          <div class="module-arrow">
+            <i class="fas fa-chevron-right"></i>
+          </div>
+        </a>
+      </li>
+    </ul>
+
+    <!-- 额外提供快捷链接及仓库信息 -->
+    <div class="repo-footer">
+      <a href="https://github.com/WoZhiZhan/W-Mod-Loader" class="github-card" target="_blank" rel="noopener">
+        <i class="fab fa-github"></i>
+        <span>WoZhiZhan/W-Mod-Loader</span>
+        <small><i class="fas fa-external-link-alt"></i></small>
+      </a>
+      <div class="footer-note">
+        <i class="fas fa-shield-alt"></i>
+        <span>支持 Maven / Gradle · 构建无忧</span>
+      </div>
+    </div>
+
+    <!-- 微小装饰文字：展示仓库根目录的直观路径（交互感） -->
+    <div style="margin-top: 1.8rem; text-align: right; font-size: 0.8rem; color: #4d5f91; border-top: 1px dashed rgba(80,120,200,0.2); padding-top: 0.8rem;">
+      <i class="fas fa-folder-open" style="margin-right: 4px;"></i> 索引: <span style="font-family: monospace;">/com/wzz/</span> 
+      <span style="background: #131b30; padding: 0.2rem 0.6rem; border-radius: 20px; margin-left: 8px;">📦 1 个模块</span>
+    </div>
+  </div>
 </body>
 </html>
