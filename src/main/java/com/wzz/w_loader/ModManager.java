@@ -1,14 +1,15 @@
 package com.wzz.w_loader;
 
-import com.wzz.w_loader.event.EventBus;
+import com.wzz.w_loader.internal.transformer.AccessTransformer;
 import com.wzz.w_loader.logger.WLogger;
-import com.wzz.w_loader.resource.ModResourceManager;
-import com.wzz.w_loader.resource.ModResourcePack;
+import com.wzz.w_loader.transform.TransformerRegistry;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.Locale;
 import java.util.jar.*;
 
 public class ModManager {
@@ -33,12 +34,29 @@ public class ModManager {
     private void scanSingleMod(File file) throws Exception {
         ModMetadata meta = readMetadata(file);
         if (meta == null) return;
-
         URLClassLoader classLoader = new URLClassLoader(
                 new URL[]{ file.toURI().toURL() },
                 Thread.currentThread().getContextClassLoader()
         );
-
+        try (JarFile jar = new JarFile(file)) {
+            JarEntry entry = jar.getJarEntry("META-INF/at.cfg");
+            if (entry != null) {
+                try (InputStream is = jar.getInputStream(entry)) {
+                    byte[] content = is.readAllBytes();
+                    if (content.length > 0) {
+                        AccessTransformer.load(new ByteArrayInputStream(content));
+                        TransformerRegistry.getInstance().register(new AccessTransformer());
+                        WLogger.info("[ModManager] Loaded at.cfg from JAR for mod: " + meta.name() +
+                                " (" + content.length + " bytes)");
+                    } else {
+                        WLogger.info("[ModManager] Found empty at.cfg in JAR for mod: " + meta.name());
+                    }
+                }
+            }
+        } catch (Exception e) {
+            WLogger.error("[ModManager] Failed to read at.cfg from JAR for mod: " + meta.name());
+            e.printStackTrace();
+        }
         ModLoader.INSTANCE.addPending(new PendingMod(meta, classLoader, file));
         WLogger.info("[ModManager] Queued: " + meta.name());
     }
@@ -50,9 +68,17 @@ public class ModManager {
             try (InputStream is = jf.getInputStream(entry)) {
                 String json = new String(is.readAllBytes());
                 ModMetadata meta = new ModMetadata();
-                meta.name    = extractJson(json, "name");
-                meta.version = extractJson(json, "version");
-                meta.main    = extractJson(json, "main");
+                meta.name        = extractJson(json, "name");
+                meta.version     = extractJson(json, "version");
+                meta.main        = extractJson(json, "main");
+                meta.description = extractJson(json, "description");
+                String modId = extractJson(json, "mod_id");
+                if (modId == null || modId.isEmpty()) {
+                    if (meta.name != null) {
+                        modId = meta.name.toLowerCase(Locale.ROOT).replace(" ", "_");
+                    }
+                }
+                meta.modId = modId;
                 if (meta.main == null || meta.main.isBlank()) return null;
                 return meta;
             }

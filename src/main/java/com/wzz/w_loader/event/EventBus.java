@@ -31,7 +31,7 @@ public class EventBus {
             listeners.computeIfAbsent(eventType, k -> new ArrayList<>())
                      .add(new ListenerEntry(listener, method));
 
-            WLogger.info("[EventBus] Registered " + listener.getClass().getSimpleName()
+            WLogger.debug("Registered " + listener.getClass().getSimpleName()
                     + "#" + method.getName() + " for " + eventType.getSimpleName());
         }
     }
@@ -50,7 +50,7 @@ public class EventBus {
             try {
                 entry.method.invoke(entry.instance, event);
             } catch (Exception e) {
-                WLogger.error("[EventBus] Error in listener " + entry.method.getName());
+                WLogger.error("Error in listener " + entry.method.getName());
                 e.printStackTrace();
             }
         }

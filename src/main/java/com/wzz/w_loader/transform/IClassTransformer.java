@@ -6,13 +6,20 @@ package com.wzz.w_loader.transform;
 public interface IClassTransformer {
 
     /**
-     * @return 要拦截的类名，格式：com/example/TargetClass（斜杠分隔）
+     * @return 要拦截的类名（斜杠分隔），返回 null 表示接管所有类（如 AccessTransformer）
      */
     String targetClass();
 
     /**
-     * @param classBytes 原始字节码
-     * @return 修改后的字节码，不修改则返回 classBytes
+     * 普通 transformer 使用，className 已由 WClassTransformer 保证匹配
      */
     byte[] transform(byte[] classBytes);
+
+    /**
+     * AT 等需要感知 className 的 transformer 覆盖此方法
+     * 默认实现直接转发给 transform(byte[])
+     */
+    default byte[] transform(String className, byte[] classBytes) {
+        return transform(classBytes);
+    }
 }

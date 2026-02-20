@@ -9,7 +9,6 @@ import com.wzz.w_loader.registry.Registries;
 import com.wzz.w_loader.resource.ModResourceManager;
 import com.wzz.w_loader.resource.ModResourcePack;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,6 +49,7 @@ public final class ModLoader {
                 e.printStackTrace();
             }
         }
+        ModResourceManager.INSTANCE.addPack(new ModResourcePack("w_loader", null, true, ModLoader.class));
         INSTANCE.pendingMods.clear();
 
         EventBus.INSTANCE.post(new RegistryEvent());

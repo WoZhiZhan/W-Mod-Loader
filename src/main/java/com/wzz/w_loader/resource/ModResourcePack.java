@@ -17,8 +17,16 @@ public class ModResourcePack extends AbstractPackResources {
 
     private final File jarFile;
     private final String modId;
+    private final boolean isBuiltin;
+    private final Class<?> sourceClass;  // 内置 Mod 的资源来源类
+    private JarFile openedJar;
+    private final Map<String, IoSupplier<InputStream>> resourceSuppliers = new HashMap<>();
 
     public ModResourcePack(String modId, File jarFile) {
+        this(modId, jarFile, false, null);
+    }
+
+    public ModResourcePack(String modId, File jarFile, boolean isBuiltin, Class<?> sourceClass) {
         super(new PackLocationInfo(
                 modId,
                 Component.literal(modId),
@@ -27,18 +35,20 @@ public class ModResourcePack extends AbstractPackResources {
         ));
         this.modId = modId;
         this.jarFile = jarFile;
+        this.isBuiltin = isBuiltin;
+        this.sourceClass = sourceClass;
     }
 
     @Override
     public IoSupplier<InputStream> getRootResource(String... paths) {
         String path = String.join("/", paths);
-        return getJarEntry(path);
+        return getResourceStream(path);
     }
 
     @Override
     public IoSupplier<InputStream> getResource(PackType type, net.minecraft.resources.Identifier loc) {
         String path = type.getDirectory() + "/" + loc.getNamespace() + "/" + loc.getPath();
-        return getJarEntry(path);
+        return getResourceStream(path);
     }
 
     @Override
@@ -48,19 +58,44 @@ public class ModResourcePack extends AbstractPackResources {
 
     @Override
     public void listResources(PackType type, String namespace, String prefix,
-                               ResourceOutput output) {
-        String dirPrefix = type.getDirectory() + "/" + namespace + "/" + prefix;
-        try (JarFile jar = new JarFile(jarFile)) {
-            Enumeration<JarEntry> entries = jar.entries();
-            while (entries.hasMoreElements()) {
-                JarEntry entry = entries.nextElement();
-                String name = entry.getName();
-                if (name.startsWith(dirPrefix) && !entry.isDirectory()) {
+                              ResourceOutput output) {
+        if (isBuiltin) {
+            listBuiltinResources(type, namespace, prefix, output);
+        } else {
+            listJarResources(type, namespace, prefix, output);
+        }
+    }
+
+    private void listBuiltinResources(PackType type, String namespace, String prefix,
+                                      ResourceOutput output) {
+        String basePath = "/" + type.getDirectory() + "/" + namespace + "/" + prefix;
+        try {
+            String resourcePath = basePath.replace("/./", "/");
+            InputStream is = sourceClass.getResourceAsStream(resourcePath);
+            if (is != null) {
+                String remaining = resourcePath.substring(
+                        (type.getDirectory() + "/" + namespace + "/").length() + 1);
+                net.minecraft.resources.Identifier loc =
+                        net.minecraft.resources.Identifier.fromNamespaceAndPath(namespace, remaining);
+                output.accept(loc, () -> is);
+            }
+        } catch (Exception _) {
+        }
+    }
+
+    private void listJarResources(PackType type, String namespace, String prefix,
+                                  ResourceOutput output) {
+        try {
+            getJar();
+            String dirPrefix = type.getDirectory() + "/" + namespace + "/" + prefix;
+            for (Map.Entry<String, IoSupplier<InputStream>> entry : resourceSuppliers.entrySet()) {
+                String name = entry.getKey();
+                if (name.startsWith(dirPrefix)) {
                     String remaining = name.substring(
                             (type.getDirectory() + "/" + namespace + "/").length());
                     net.minecraft.resources.Identifier loc =
                             net.minecraft.resources.Identifier.fromNamespaceAndPath(namespace, remaining);
-                    output.accept(loc, getJarEntry(name));
+                    output.accept(loc, entry.getValue());
                 }
             }
         } catch (Exception e) {
@@ -68,8 +103,36 @@ public class ModResourcePack extends AbstractPackResources {
         }
     }
 
+    private IoSupplier<InputStream> getResourceStream(String path) {
+        if (isBuiltin) {
+            InputStream is = sourceClass.getResourceAsStream("/" + path);
+            return is != null ? () -> is : null;
+        } else {
+            try {
+                getJar();
+                return resourceSuppliers.get(path);
+            } catch (Exception e) {
+                return null;
+            }
+        }
+    }
+
     @Override
     public Set<String> getNamespaces(PackType type) {
+        if (isBuiltin) {
+            return getBuiltinNamespaces(type);
+        } else {
+            return getJarNamespaces(type);
+        }
+    }
+
+    private Set<String> getBuiltinNamespaces(PackType type) {
+        Set<String> namespaces = new HashSet<>();
+        namespaces.add(modId);
+        return namespaces;
+    }
+
+    private Set<String> getJarNamespaces(PackType type) {
         Set<String> namespaces = new HashSet<>();
         try (JarFile jar = new JarFile(jarFile)) {
             Enumeration<JarEntry> entries = jar.entries();
@@ -89,11 +152,17 @@ public class ModResourcePack extends AbstractPackResources {
         return namespaces;
     }
 
-    private JarFile openedJar = null;
-
-    private JarFile getJar() throws Exception {
-        if (openedJar == null) {
+    private synchronized JarFile getJar() throws Exception {
+        if (openedJar == null && !isBuiltin) {
             openedJar = new JarFile(jarFile);
+            Enumeration<JarEntry> entries = openedJar.entries();
+            while (entries.hasMoreElements()) {
+                JarEntry entry = entries.nextElement();
+                if (!entry.isDirectory()) {
+                    String path = entry.getName();
+                    resourceSuppliers.put(path, () -> openedJar.getInputStream(entry));
+                }
+            }
         }
         return openedJar;
     }
@@ -103,17 +172,7 @@ public class ModResourcePack extends AbstractPackResources {
         if (openedJar != null) {
             try { openedJar.close(); } catch (Exception ignored) {}
             openedJar = null;
-        }
-    }
-
-    private IoSupplier<InputStream> getJarEntry(String path) {
-        try {
-            JarFile jar = getJar();
-            JarEntry entry = jar.getJarEntry(path);
-            if (entry == null) return null;
-            return () -> jar.getInputStream(entry);
-        } catch (Exception e) {
-            return null;
+            resourceSuppliers.clear();
         }
     }
 }

@@ -1,0 +1,10 @@
+{
+  "w_loader.mods.installed": "已安装模组",
+  "w_loader.mods.select": "选择一个模组查看详情",
+  "w_loader.mods.version": "版本",
+  "w_loader.mods.id": "ID",
+  "w_loader.mods.description": "介绍",
+  "w_loader.mods.no_description": "暂无介绍",
+  "w_loader.mods.main_class": "主类",
+  "w_loader.mods.loader_info": "W 加载器 %s | %d 个模组"
+}

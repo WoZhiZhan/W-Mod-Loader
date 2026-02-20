@@ -1,7 +1,7 @@
 package com.wzz.w_loader.asm;
 
-import org.objectweb.asm.ClassReader;
-import org.objectweb.asm.ClassWriter;
+import com.wzz.w_loader.internal.library.objectweb.asm.ClassReader;
+import com.wzz.w_loader.internal.library.objectweb.asm.ClassWriter;
 
 /**
  * 重写 getCommonSuperClass，用指定 ClassLoader 加载类，

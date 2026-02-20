@@ -22,9 +22,11 @@ public class WClassTransformer implements ClassFileTransformer {
         byte[] result = classfileBuffer;
 
         for (IClassTransformer transformer : transformers) {
-            if (className.equals(transformer.targetClass())) {
+            String target = transformer.targetClass();
+            // target == null 表示该 transformer 处理所有类（如 AccessTransformer）
+            if (target == null || className.equals(target)) {
                 try {
-                    result = transformer.transform(result);
+                    result = transformer.transform(className, result);
                 } catch (Throwable e) {
                     WLogger.error("[WClassTransformer] Failed to transform " + className
                             + " using " + transformer.getClass().getSimpleName());

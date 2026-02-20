@@ -1,11 +1,19 @@
 package com.wzz.w_loader.registry;
 
+import net.minecraft.core.particles.ParticleType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.Identifier;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.sounds.SoundEvent;
+import net.minecraft.world.effect.MobEffect;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 
 import java.util.*;
 import java.util.function.Supplier;
@@ -31,8 +39,40 @@ public class Registry<T> {
         return new Registry<>("blocks", BuiltInRegistries.BLOCK.key());
     }
 
+    public static Registry<EntityType<?>> entities() {
+        return new Registry<>("entities", BuiltInRegistries.ENTITY_TYPE.key());
+    }
+
     public static Registry<CreativeModeTab> tabs() {
         return new Registry<>("tabs", BuiltInRegistries.CREATIVE_MODE_TAB.key());
+    }
+
+    public static Registry<MobEffect> mobEffects() {
+        return new Registry<>("mob_effects", BuiltInRegistries.MOB_EFFECT.key());
+    }
+
+    public static Registry<MenuType<?>> menus() {
+        return new Registry<>("menus", BuiltInRegistries.MENU.key());
+    }
+
+    public static Registry<ParticleType<?>> particles() {
+        return new Registry<>("particles", BuiltInRegistries.PARTICLE_TYPE.key());
+    }
+
+    public static Registry<BlockEntityType<?>> blockEntities() {
+        return new Registry<>("block_entities", BuiltInRegistries.BLOCK_ENTITY_TYPE.key());
+    }
+
+    public static Registry<Attribute> attributes() {
+        return new Registry<>("attribute", BuiltInRegistries.ATTRIBUTE.key());
+    }
+
+    public static Registry<RecipeType<?>> recipes() {
+        return new Registry<>("recipes", BuiltInRegistries.RECIPE_TYPE.key());
+    }
+
+    public static Registry<SoundEvent> sounds() {
+        return new Registry<>("sounds", BuiltInRegistries.SOUND_EVENT.key());
     }
 
     /**

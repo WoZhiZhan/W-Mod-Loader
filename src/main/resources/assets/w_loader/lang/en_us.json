@@ -1,0 +1,10 @@
+{
+  "w_loader.mods.installed": "Installed Mods",
+  "w_loader.mods.select": "Select a mod to view details",
+  "w_loader.mods.version": "Version",
+  "w_loader.mods.id": "ID",
+  "w_loader.mods.description": "Description",
+  "w_loader.mods.no_description": "No description available",
+  "w_loader.mods.main_class": "Main Class",
+  "w_loader.mods.loader_info": "W Loader %s | %d mod%s loaded"
+}

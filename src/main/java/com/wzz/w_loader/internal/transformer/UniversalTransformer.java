@@ -3,8 +3,8 @@ package com.wzz.w_loader.internal.transformer;
 import com.wzz.w_loader.asm.SafeClassWriter;
 import com.wzz.w_loader.hook.HookManager;
 import com.wzz.w_loader.hook.HookPoint;
+import com.wzz.w_loader.internal.library.objectweb.asm.*;
 import com.wzz.w_loader.transform.IClassTransformer;
-import org.objectweb.asm.*;
 
 import java.util.List;
 
@@ -91,59 +91,91 @@ public class UniversalTransformer implements IClassTransformer {
                             slot = loadArg(mv, argTypes[i], slot);
                             mv.visitInsn(Opcodes.AASTORE);
                         }
-                        mv.visitMethodInsn(Opcodes.INVOKESTATIC,
-                                "com/wzz/w_loader/hook/HookDispatcher", "dispatch",
+                        mv.visitMethodInsn(
+                                Opcodes.INVOKESTATIC,
+                                "com/wzz/w_loader/hook/HookDispatcher",
+                                "dispatch",
                                 "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;" +
-                                        "Ljava/lang/String;Ljava/lang/Object;[Ljava/lang/Object;)" +
-                                        "Lcom/wzz/w_loader/event/Event;", false);
+                                        "Ljava/lang/String;Ljava/lang/Object;[Ljava/lang/Object;)Z",
+                                false
+                        );
                         // stack: Event
 
                         if (position.equals("HEAD")) {
                             Label notCancelled = new Label();
-                            Label doCancel     = new Label();
-
-                            // ── 检查 null ──────────────────────────────────────────
-                            mv.visitInsn(Opcodes.DUP);
-                            // stack: Event, Event
-                            mv.visitJumpInsn(Opcodes.IFNULL, notCancelled);
-                            // null → notCancelled，stack 还剩: Event
-
-                            // ── 检查 isCancellable() ───────────────────────────────
-                            mv.visitInsn(Opcodes.DUP);
-                            // stack: Event, Event
-                            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL,
-                                    "com/wzz/w_loader/event/Event", "isCancellable", "()Z", false);
-                            // stack: Event, boolean
                             mv.visitJumpInsn(Opcodes.IFEQ, notCancelled);
-                            // false → notCancelled，stack 还剩: Event
-
-                            // ── 检查 isCancelled() ────────────────────────────────
-                            mv.visitInsn(Opcodes.DUP);
-                            // stack: Event, Event
-                            mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL,
-                                    "com/wzz/w_loader/event/Event", "isCancelled", "()Z", false);
-                            // stack: Event, boolean
-                            mv.visitJumpInsn(Opcodes.IFNE, doCancel);
-                            // true → doCancel，stack 还剩: Event
-                            mv.visitJumpInsn(Opcodes.GOTO, notCancelled);
-                            // false → notCancelled，stack 还剩: Event
-
-                            // ── 真正取消：POP Event，插入 return ─────────────────
-                            mv.visitLabel(doCancel);
-                            // stack: Event
-                            mv.visitInsn(Opcodes.POP);
-                            // stack: {}
                             insertCancelReturn(returnType);
-
-                            // ── 所有 notCancelled 路径：stack 都是 { Event } ─────
                             mv.visitLabel(notCancelled);
-                            // stack: Event
-                            mv.visitInsn(Opcodes.POP);
-                            // stack: {} 统一清空
 
+                            // 调用 HookDispatcher.getAndClearWriteBack() 拿回 args 数组
+                            mv.visitMethodInsn(Opcodes.INVOKESTATIC,
+                                    "com/wzz/w_loader/hook/HookDispatcher",
+                                    "getAndClearWriteBack",
+                                    "()[Ljava/lang/Object;",
+                                    false);
+
+                            // 遍历每个 primitive 参数，从 args[i] 写回对应 slot
+                            int writeSlot = isStatic ? 0 : 1;
+                            for (int i = 0; i < argTypes.length; i++) {
+                                Type t = argTypes[i];
+                                if (isPrimitive(t)) {
+                                    mv.visitInsn(Opcodes.DUP);
+                                    mv.visitIntInsn(Opcodes.BIPUSH, i);
+                                    mv.visitInsn(Opcodes.AALOAD);
+                                    unboxAndStore(mv, t, writeSlot);
+                                } else {
+                                    mv.visitInsn(Opcodes.DUP);
+                                    mv.visitIntInsn(Opcodes.BIPUSH, i);
+                                    mv.visitInsn(Opcodes.AALOAD);
+                                    if (t.getSort() == Type.ARRAY) {
+                                        mv.visitTypeInsn(Opcodes.CHECKCAST, t.getDescriptor());
+                                    } else {
+                                        mv.visitTypeInsn(Opcodes.CHECKCAST, t.getInternalName());
+                                    }
+                                    mv.visitVarInsn(Opcodes.ASTORE, writeSlot);
+                                }
+                                writeSlot += t.getSize();
+                            }
+                            mv.visitInsn(Opcodes.POP);
                         } else {
                             // TAIL 直接丢弃
                             mv.visitInsn(Opcodes.POP);
+                        }
+                    }
+
+                    private boolean isPrimitive(Type t) {
+                        int s = t.getSort();
+                        return s == Type.BOOLEAN || s == Type.BYTE || s == Type.CHAR ||
+                                s == Type.SHORT   || s == Type.INT  || s == Type.LONG  ||
+                                s == Type.FLOAT   || s == Type.DOUBLE;
+                    }
+
+                    private void unboxAndStore(MethodVisitor mv, Type type, int slot) {
+                        switch (type.getSort()) {
+                            case Type.BOOLEAN -> { mv.visitTypeInsn(Opcodes.CHECKCAST, "java/lang/Boolean");
+                                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Boolean", "booleanValue", "()Z", false);
+                                mv.visitVarInsn(Opcodes.ISTORE, slot); }
+                            case Type.BYTE    -> { mv.visitTypeInsn(Opcodes.CHECKCAST, "java/lang/Byte");
+                                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Byte", "byteValue", "()B", false);
+                                mv.visitVarInsn(Opcodes.ISTORE, slot); }
+                            case Type.CHAR    -> { mv.visitTypeInsn(Opcodes.CHECKCAST, "java/lang/Character");
+                                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Character", "charValue", "()C", false);
+                                mv.visitVarInsn(Opcodes.ISTORE, slot); }
+                            case Type.SHORT   -> { mv.visitTypeInsn(Opcodes.CHECKCAST, "java/lang/Short");
+                                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Short", "shortValue", "()S", false);
+                                mv.visitVarInsn(Opcodes.ISTORE, slot); }
+                            case Type.INT     -> { mv.visitTypeInsn(Opcodes.CHECKCAST, "java/lang/Integer");
+                                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Integer", "intValue", "()I", false);
+                                mv.visitVarInsn(Opcodes.ISTORE, slot); }
+                            case Type.LONG    -> { mv.visitTypeInsn(Opcodes.CHECKCAST, "java/lang/Long");
+                                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Long", "longValue", "()J", false);
+                                mv.visitVarInsn(Opcodes.LSTORE, slot); }
+                            case Type.FLOAT   -> { mv.visitTypeInsn(Opcodes.CHECKCAST, "java/lang/Float");
+                                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Float", "floatValue", "()F", false);
+                                mv.visitVarInsn(Opcodes.FSTORE, slot); }
+                            case Type.DOUBLE  -> { mv.visitTypeInsn(Opcodes.CHECKCAST, "java/lang/Double");
+                                mv.visitMethodInsn(Opcodes.INVOKEVIRTUAL, "java/lang/Double", "doubleValue", "()D", false);
+                                mv.visitVarInsn(Opcodes.DSTORE, slot); }
                         }
                     }
 

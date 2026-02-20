@@ -1,6 +1,5 @@
 package com.wzz.w_loader.hook;
 
-import com.wzz.w_loader.event.Event;
 import com.wzz.w_loader.logger.WLogger;
 
 import java.util.List;
@@ -11,38 +10,39 @@ import java.util.List;
  */
 public final class HookDispatcher {
 
-    private HookDispatcher() {}
+    private static final ThreadLocal<Object[]> WRITEBACK = new ThreadLocal<>();
 
-    /**
-     * @param className   斜杠格式类名
-     * @param methodName  方法名
-     * @param descriptor  方法描述符
-     * @param position    "HEAD" or "TAIL"
-     * @param self        this 引用（静态方法传 null）
-     * @param args        方法参数数组
-     * 返回 posted 的 Event 对象，调用方检查 isCancelled()
-     */
-    public static Event dispatch(String className, String methodName,
-                                 String descriptor, String position,
-                                 Object self, Object[] args) {
+    public static boolean dispatch(String className, String methodName,
+                                   String descriptor, String position,
+                                   Object self, Object[] args) {
         List<HookPoint> points = HookManager.INSTANCE.getHooks(className);
         HookPoint.Position pos = HookPoint.Position.valueOf(position);
-        Event lastEvent = null;
+        HookContext ctx = new HookContext(self, args);
 
         for (HookPoint point : points) {
             if (!point.methodName.equals(methodName)) continue;
             if (point.descriptor != null && !point.descriptor.equals(descriptor)) continue;
             if (point.position != pos) continue;
-
             try {
-                HookContext ctx = new HookContext(self, args);
                 point.callback.call(ctx);
-                if (ctx.getLastEvent() != null) lastEvent = ctx.getLastEvent();
             } catch (Throwable e) {
                 WLogger.error("[HookDispatcher] " + className + "#" + methodName + " threw: " + e);
                 e.printStackTrace();
             }
         }
-        return lastEvent;
+
+        // HEAD 且未取消时，把 args 存起来供 transformer 写回
+        if (pos == HookPoint.Position.HEAD && !ctx.isCancelled()) {
+            WRITEBACK.set(args);
+        }
+
+        return ctx.isCancelled();
+    }
+
+    /** transformer 在 HEAD dispatch 之后立即调用，拿回可能被修改的 args */
+    public static Object[] getAndClearWriteBack() {
+        Object[] v = WRITEBACK.get();
+        WRITEBACK.remove();
+        return v;
     }
 }
