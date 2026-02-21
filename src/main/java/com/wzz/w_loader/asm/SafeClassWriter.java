@@ -3,10 +3,9 @@ package com.wzz.w_loader.asm;
 import com.wzz.w_loader.internal.library.objectweb.asm.ClassReader;
 import com.wzz.w_loader.internal.library.objectweb.asm.ClassWriter;
 
-/**
- * 重写 getCommonSuperClass，用指定 ClassLoader 加载类，
- * 避免 COMPUTE_FRAMES 时找不到 MC 类导致崩溃。
- */
+import java.util.HashSet;
+import java.util.Set;
+
 public class SafeClassWriter extends ClassWriter {
 
     private final ClassLoader classLoader;
@@ -18,27 +17,26 @@ public class SafeClassWriter extends ClassWriter {
 
     @Override
     protected String getCommonSuperClass(String type1, String type2) {
-        // 如果两个类型相同，直接返回
         if (type1.equals(type2)) return type1;
 
         try {
-            Class<?> c1 = Class.forName(type1.replace('/', '.'), false, classLoader);
-            Class<?> c2 = Class.forName(type2.replace('/', '.'), false, classLoader);
+            Set<String> supers1 = new HashSet<>();
+            String s = type1;
+            while (s != null) {
+                supers1.add(s);
+                ClassReader cr = new ClassReader(s);
+                s = cr.getSuperName();
+            }
 
-            if (c1.isAssignableFrom(c2)) return type1;
-            if (c2.isAssignableFrom(c1)) return type2;
-            if (c1.isInterface() || c2.isInterface()) return "java/lang/Object";
+            s = type2;
+            while (s != null) {
+                if (supers1.contains(s)) return s;
+                ClassReader cr = new ClassReader(s);
+                s = cr.getSuperName();
+            }
 
-            // 向上查找公共父类
-            do {
-                c1 = c1.getSuperclass();
-            } while (!c1.isAssignableFrom(c2));
+        } catch (Throwable ignored) {}
 
-            return c1.getName().replace('.', '/');
-
-        } catch (Exception e) {
-            // 找不到类时回退到 Object，总比崩溃强
-            return "java/lang/Object";
-        }
+        return "java/lang/Object";
     }
 }

@@ -13,14 +13,20 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.core.BlockPos;
+import net.minecraft.network.protocol.game.ClientboundEntityEventPacket;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ExplosionDamageCalculator;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 
 import java.util.Collection;
@@ -540,6 +546,129 @@ public class VanillaHooks {
             if (event.isModified()) {
                 ctx.setArg(1, event.getFont());
                 ctx.setArg(2, event.getTooltipLines());
+            }
+        }
+    }
+
+    @Hook(
+            cls = "net/minecraft/client/multiplayer/ClientPacketListener",
+            method = "handleEntityEvent",
+            descriptor = "(Lnet/minecraft/network/protocol/game/ClientboundEntityEventPacket;)V"
+    )
+    public static void onHandleEntityEvent(HookContext ctx) {
+        ClientboundEntityEventPacket packet = ctx.getArg(1);
+        Level level = ReflectUtil.getField(ctx.getSelf(), "level");
+        if (level != null) {
+            Entity entity = packet.getEntity(level);
+            if (entity != null) {
+                HandleEntityEvent handleEntityEvent = new HandleEntityEvent(entity, packet.getEventId());
+                EventBus.INSTANCE.post(handleEntityEvent);
+                if (packet.getEventId() == 35) {
+                    ctx.post(new TotemTriggerEvent(entity, null));
+                }
+            }
+        }
+    }
+
+    @Hook(
+            cls = "net/minecraft/world/entity/LivingEntity",
+            method = "checkTotemDeathProtection",
+            descriptor = "(Lnet/minecraft/world/damagesource/DamageSource;)Z"
+    )
+    public static void beforeBroadcastEntityEvent(HookContext ctx) {
+        TotemTriggerEvent totemTriggerEvent = new TotemTriggerEvent(ctx.getSelf(), ctx.getArg(1));
+        ctx.post(totemTriggerEvent);
+    }
+
+    @Hook(
+            cls = "net/minecraft/server/level/ServerLevel",
+            method = "tickChunk",
+            descriptor = "(Lnet/minecraft/world/level/chunk/LevelChunk;I)V"
+    )
+    public static void onTickLevelChunk(HookContext ctx) {
+        EventBus.INSTANCE.post(new ServerTickChunkEvent(ctx.getSelf(), ctx.getArg(1), ctx.getArg(2)));
+    }
+
+    @Hook(
+            cls = "net/minecraft/server/level/ServerLevel",
+            method = "wakeUpAllPlayers",
+            descriptor = "()V"
+    )
+    public static void onWakeUpAllPlayers(HookContext ctx) {
+        ctx.post(new ServerWakeUpAllPlayersEvent(ctx.getSelf()));
+    }
+
+    @Hook(
+            cls = "net/minecraft/world/level/Level",
+            method = "setBlock",
+            descriptor = "()V"
+    )
+    public static void onSetBlock(HookContext ctx) {
+        Level level = ctx.getSelf();
+        BlockPos pos = ctx.getArg(1);
+        BlockState state = ctx.getArg(2);
+        int updateFlags = ctx.getArg(3);
+        int updateLimit = ctx.getArg(4);
+        SetBlockEvent setBlockEvent = new SetBlockEvent(level, pos, state, updateFlags, updateLimit);
+        ctx.post(setBlockEvent);
+    }
+
+    @Hook(
+            cls = "net/minecraft/world/level/Level",
+            method = "setBlockEntity",
+            descriptor = "(Lnet/minecraft/world/level/block/entity/BlockEntity;)V"
+    )
+    public static void onSetBlockEntity(HookContext ctx) {
+        Level level = ctx.getSelf();
+        BlockEntity blockEntity = ctx.getArg(1);
+        SetBlockEntityEvent setBlockEvent = new SetBlockEntityEvent(level, blockEntity);
+        ctx.post(setBlockEvent);
+    }
+
+    @Hook(
+            cls = "net/minecraft/CrashReport",
+            method = "getDetails",
+            descriptor = "(Ljava/lang/StringBuilder;)V"
+    )
+    public static void onGetDetails(HookContext ctx) {
+        StringBuilder builder = ctx.getArg(1);
+        CrashReportEvent event = new CrashReportEvent(
+                ctx.getSelf(),
+                builder
+        );
+        ctx.post(event);
+        if (event.isModified()) {
+            ctx.setArg(1, event.getBuilder());
+        }
+    }
+
+    @Hook(
+            cls = "net/minecraft/server/level/ServerLevel",
+            method = "explode",
+            descriptor = "(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/world/damagesource/DamageSource;Lnet/minecraft/world/level/ExplosionDamageCalculator;DDDFZLnet/minecraft/world/level/Level$ExplosionInteraction;Lnet/minecraft/core/particles/ParticleOptions;Lnet/minecraft/core/particles/ParticleOptions;Lnet/minecraft/util/random/WeightedList;Lnet/minecraft/core/Holder;)V"
+    )
+    public static void onExplosionCreated(HookContext ctx) {
+        ServerLevel level = ctx.getSelf();
+        Entity source = ctx.getArg(1);
+        DamageSource damageSource = ctx.getArg(2);
+        ExplosionDamageCalculator damageCalculator = ctx.getArg(3);
+        double x = ctx.getArg(4);
+        double y = ctx.getArg(5);
+        double z = ctx.getArg(6);
+        float radius = ctx.getArg(7);
+        boolean fire = ctx.getArg(8);
+        Level.ExplosionInteraction interactionType = ctx.getArg(9);
+        ExplosionEvent explosionEvent = new ExplosionEvent(
+                level, source, damageSource, damageCalculator,
+                interactionType, x, y, z, radius, fire
+        );
+        ctx.post(explosionEvent);
+        if (explosionEvent.hasModifications()) {
+            if (explosionEvent.isRadiusModified()) {
+                ctx.setArg(7, explosionEvent.getModifiedRadius());
+            }
+            if (explosionEvent.isFireModified()) {
+                ctx.setArg(8, explosionEvent.isModifiedFire());
             }
         }
     }

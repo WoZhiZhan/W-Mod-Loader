@@ -19,7 +19,7 @@ public class ModRepositorySource implements RepositorySource {
                     new PackLocationInfo(
                             pack.packId(),
                             net.minecraft.network.chat.Component.literal(pack.packId()),
-                            PackSource.DEFAULT,
+                            PackSource.BUILT_IN,
                             java.util.Optional.empty()
                     ),
                     new Pack.ResourcesSupplier() {
@@ -43,7 +43,7 @@ public class ModRepositorySource implements RepositorySource {
 
             if (wrappedPack != null) {
                 consumer.accept(wrappedPack);
-                WLogger.info("[ModRepositorySource] Loaded pack: " + pack.packId());
+                WLogger.debug("[ModRepositorySource] Loaded pack: " + pack.packId());
             }
         }
     }

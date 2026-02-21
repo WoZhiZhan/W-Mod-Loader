@@ -7,6 +7,7 @@ import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+/** 注：直接调用EventBus.INSTANCE.post发布的事件无法被取消 */
 public class EventBus {
 
     public static final EventBus INSTANCE = new EventBus();

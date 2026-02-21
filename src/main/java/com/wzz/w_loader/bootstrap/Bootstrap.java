@@ -17,7 +17,7 @@ import java.net.URL;
 import java.net.URLClassLoader;
 
 public class Bootstrap {
-    public static final String version = "1.0.0";
+    public static final String version = "1.1";
 
     public static void premain(String args, Instrumentation instrumentation) {
         WLogger.info("========== W Loader Starting ==========");

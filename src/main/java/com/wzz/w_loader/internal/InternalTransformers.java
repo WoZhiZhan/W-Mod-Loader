@@ -31,6 +31,8 @@ public final class InternalTransformers {
             "net/minecraft/world/level/Level",
             "net/minecraft/client/gui/screens/inventory/tooltip/TooltipRenderUtil",
             "net/minecraft/client/gui/GuiGraphics",
+            "net/minecraft/client/multiplayer/ClientPacketListener",
+            "net/minecraft/CrashReport",
     };
 
     public static void registerAll() {
