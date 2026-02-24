@@ -1,0 +1,100 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.wzz",
+    "module": "w-loader-api",
+    "version": "1.2",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "9.2.0"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 25,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api"
+      },
+      "files": [
+        {
+          "name": "w-loader-api-1.2.jar",
+          "url": "w-loader-api-1.2.jar",
+          "size": 438482,
+          "sha512": "5f1d6b2869feec3df07055fa1ab17e977fef46ae64680048fea0dc696c1974f8ce086a188a1de63b3afcbd9f25b22ca3d401236caaa2ad9975dadec188df0dd9",
+          "sha256": "ab73a19b3b97c7c332fd24995b2ac6ba3b95bfba73068f6fa3976036226794b5",
+          "sha1": "5e3bd5641d2f502c4f5d4bcd1da70ba27cad7c9b",
+          "md5": "55e93a4e6b2d53b53ffdb5d2ea132b96"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 25,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "w-loader-api-1.2.jar",
+          "url": "w-loader-api-1.2.jar",
+          "size": 438482,
+          "sha512": "5f1d6b2869feec3df07055fa1ab17e977fef46ae64680048fea0dc696c1974f8ce086a188a1de63b3afcbd9f25b22ca3d401236caaa2ad9975dadec188df0dd9",
+          "sha256": "ab73a19b3b97c7c332fd24995b2ac6ba3b95bfba73068f6fa3976036226794b5",
+          "sha1": "5e3bd5641d2f502c4f5d4bcd1da70ba27cad7c9b",
+          "md5": "55e93a4e6b2d53b53ffdb5d2ea132b96"
+        }
+      ]
+    },
+    {
+      "name": "sourcesElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "sources",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "w-loader-api-1.2-sources.jar",
+          "url": "w-loader-api-1.2-sources.jar",
+          "size": 427830,
+          "sha512": "42374f6644a0b10be29a49478a84a5a12734495f41213ba8137ced52d69ab47f3b5bd7aa81b247c0150bc4635afe4cbc226e30b861f1934bc92a75466a004066",
+          "sha256": "bfc905b5589e5cbf4fa0fd4f0a6da10005cb05eecd66eef286ff98225afc51a6",
+          "sha1": "c21d93b14a7ba2e26919d1d9bdc17654f6bc1fa5",
+          "md5": "6816d169577873f61a4e3040fbf83388"
+        }
+      ]
+    },
+    {
+      "name": "javadocElements",
+      "attributes": {
+        "org.gradle.category": "documentation",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.docstype": "javadoc",
+        "org.gradle.usage": "java-runtime"
+      },
+      "files": [
+        {
+          "name": "w-loader-api-1.2-javadoc.jar",
+          "url": "w-loader-api-1.2-javadoc.jar",
+          "size": 5117583,
+          "sha512": "ad24a79b0b7395c78195e99d70dedbe8b70dc2bddd7932a75d1f2d94e6aa7cf6edc33afed46303e029f898350ee4e40c0591721ae785cfe1d54edaa74ab8b5cc",
+          "sha256": "49184f9c598b94d201c936e2c1831591e477fc5312574ffe9a6671ab9fc1d968",
+          "sha1": "051e93e74a2fed6fe4bb3f15bf8ddec24b675575",
+          "md5": "3457ca1bc084f4c56292915ec94200ec"
+        }
+      ]
+    }
+  ]
+}
