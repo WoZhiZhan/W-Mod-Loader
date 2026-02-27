@@ -43,7 +43,7 @@ public class EnchantmentEvent extends Event {
 
     @Override
     public boolean isCancellable() {
-        return true; // 标记事件可取消
+        return true;
     }
 
     public RegistryAccess getRegistryAccess() {

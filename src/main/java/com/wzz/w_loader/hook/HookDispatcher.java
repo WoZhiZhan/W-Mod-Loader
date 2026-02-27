@@ -13,6 +13,7 @@ public final class HookDispatcher {
     private static final ThreadLocal<Object[]> WRITEBACK = new ThreadLocal<>();
     private static final ThreadLocal<Object>   RETURN_VALUE     = new ThreadLocal<>();
     private static final ThreadLocal<Boolean>  RETURN_VALUE_SET = new ThreadLocal<>();
+    private static final ThreadLocal<Object> PRE_RETURN_VALUE = new ThreadLocal<>();
 
     public static boolean dispatch(String className, String methodName,
                                    String descriptor, String position,
@@ -20,7 +21,10 @@ public final class HookDispatcher {
         List<HookPoint> points = HookManager.INSTANCE.getHooks(className);
         HookPoint.Position pos = HookPoint.Position.valueOf(position);
         HookContext ctx = new HookContext(self, args);
-
+        if (pos == HookPoint.Position.TAIL) {
+            ctx.initReturnValue(PRE_RETURN_VALUE.get());
+            PRE_RETURN_VALUE.remove();
+        }
         for (HookPoint point : points) {
             if (!point.methodName.equals(methodName)) continue;
             if (point.descriptor != null && !point.descriptor.equals(descriptor)) continue;
@@ -43,6 +47,10 @@ public final class HookDispatcher {
         }
 
         return ctx.isCancelled();
+    }
+
+    public static void setPreReturnValue(Object val) {
+        PRE_RETURN_VALUE.set(val);
     }
 
     public static Object[] getAndClearWriteBack() {

@@ -16,6 +16,7 @@ import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.commands.CommandBuildContext;
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.RegistryAccess;
@@ -947,43 +948,34 @@ public class VanillaHooks {
         if (level != event.getNewLevel()) {
             ctx.setArg(1, event.getNewLevel());        }
     }
+
     @Hook(
             cls = "net/minecraft/commands/Commands",
             method = "<init>",
             descriptor = "(Lnet/minecraft/commands/Commands$CommandSelection;Lnet/minecraft/commands/CommandBuildContext;)V",
             at = HookPoint.Position.TAIL
     )
-    public static void onCommandReg(HookContext ctx) throws Exception {
-        Field field = ctx.getSelf().getClass().getDeclaredField("dispatcher");
-        field.setAccessible(true);
-        CommandDispatcher dispatcher = (CommandDispatcher) field.get(ctx.getSelf());
+    public static void onCommandReg(HookContext ctx) {
+        CommandDispatcher<CommandSourceStack> dispatcher = ReflectUtil.getField(ctx.getSelf(), "dispatcher");
         Commands.CommandSelection environment = ctx.getArg(1);
         CommandBuildContext context = ctx.getArg(2);
         RegisterCommandsEvent event = new RegisterCommandsEvent(dispatcher,environment,context);
         ctx.post(event);
     }
+
+    @SuppressWarnings("unchecked")
     @Hook(
             cls = "net/minecraft/world/inventory/EnchantmentMenu",
             method = "getEnchantmentList",
-            descriptor = "(Lnet/minecraft/core/RegistryAccess;Lnet/minecraft/world/item/ItemStack;II)Ljava/util/List;"
+            descriptor = "(Lnet/minecraft/core/RegistryAccess;Lnet/minecraft/world/item/ItemStack;II)Ljava/util/List;",
+            at = HookPoint.Position.TAIL
     )
     public static void onEnchantmentGenerate(HookContext ctx) {
-        RegistryAccess registryAccess = (RegistryAccess) ctx.getArg(0);
-        ItemStack enchantItem = (ItemStack) ctx.getArg(1);
-        int enchantSlot = (int) ctx.getArg(2);
-        int enchantCost = (int) ctx.getArg(3);
-        EnchantmentMenu enchantMenu = (EnchantmentMenu) ctx.getSelf();
-        Player player = null;
-        try {
-            player = ReflectUtil.getField(enchantMenu, "player");
-        } catch (Exception e) {
-            player = null;
-        }
-
-        // 3. 获取原版生成的附魔列表
+        RegistryAccess registryAccess = ctx.getArg(1);
+        ItemStack enchantItem = ctx.getArg(2);
+        int enchantSlot = ctx.getArg(3);
+        int enchantCost = ctx.getArg(4);
         List<EnchantmentInstance> originalEnchantList = (List<EnchantmentInstance>) ctx.getReturnValue();
-
-        // 4. 触发事件（传递 6 个参数，匹配修正后的构造方法，解决参数数量报错）
         EnchantmentEvent event = new EnchantmentEvent(
                 registryAccess,
                 enchantItem,
@@ -992,12 +984,10 @@ public class VanillaHooks {
                 originalEnchantList
         );
         ctx.post(event);
-
-        // 5. 根据事件结果修改返回值
         if (ctx.isCancelled()) {
-            ctx.setReturnValue(List.of()); // 取消附魔，返回空列表
+            ctx.setReturnValue(List.of());
         } else if (event.getModifiedEnchantList() != null) {
-            ctx.setReturnValue(event.getModifiedEnchantList()); // 覆盖附魔列表
+            ctx.setReturnValue(event.getModifiedEnchantList());
         }
     }
 

@@ -247,10 +247,21 @@ public class UniversalTransformer implements IClassTransformer {
                         mv.visitLabel(afterCall);
                     }
 
-                    // ── HEAD/TAIL 公用插桩（与原来完全一致）──────────────────
+                    // ── HEAD/TAIL 公用插桩
                     private void insertDispatch(String position, boolean isStatic,
                                                 Type[] at, String desc, String mName,
                                                 Type returnType) {
+                        if (position.equals("TAIL") && returnType.getSort() != Type.VOID) {
+                            // 栈顶是返回值，DUP 一份
+                            mv.visitInsn(returnType.getSize() == 2 ? Opcodes.DUP2 : Opcodes.DUP);
+                            // box 成 Object
+                            box(returnType);
+                            // 调用 setPreReturnValue
+                            mv.visitMethodInsn(Opcodes.INVOKESTATIC,
+                                    "com/wzz/w_loader/hook/HookDispatcher",
+                                    "setPreReturnValue",
+                                    "(Ljava/lang/Object;)V", false);
+                        }
                         mv.visitLdcInsn(className);
                         mv.visitLdcInsn(mName);
                         mv.visitLdcInsn(desc);
@@ -305,7 +316,8 @@ public class UniversalTransformer implements IClassTransformer {
                                 writeSlot += t.getSize();
                             }
                             mv.visitInsn(Opcodes.POP);
-                        } else { // TAIL
+                        } else {
+                            // TAIL
                             // dispatch 结果（boolean isCancelled）已经在栈上，POP 掉
                             mv.visitInsn(Opcodes.POP);
 

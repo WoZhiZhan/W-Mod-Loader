@@ -38,6 +38,10 @@ public class HookContext {
         this.returnValueSet = true;
     }
 
+    public void initReturnValue(Object value) {
+        this.returnValue = value;
+    }
+
     public Object getReturnValue() { return returnValue; }
 
     public boolean isReturnValueSet() { return returnValueSet; }
