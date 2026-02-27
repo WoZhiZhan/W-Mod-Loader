@@ -37,7 +37,6 @@ public final class InternalTransformers {
             "net/minecraft/world/entity/item/ItemEntity",
             "net/minecraft/client/renderer/entity/EntityRenderDispatcher",
             "net/minecraft/commands/Commands",
-            "net/minecraft/server/MinecraftServer",
             "net/minecraft/world/inventory/EnchantmentMenu",
     };
 
