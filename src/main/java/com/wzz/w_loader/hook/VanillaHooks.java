@@ -945,7 +945,8 @@ public class VanillaHooks {
         EntitySetLevelEvent event = new EntitySetLevelEvent(ctx.getSelf(), level);
         ctx.post(event);
         if (level != event.getNewLevel()) {
-            ctx.setArg(1, event.getNewLevel());        }
+            ctx.setArg(1, event.getNewLevel());        
+        }
     }
     @Hook(
             cls = "net/minecraft/commands/Commands",
