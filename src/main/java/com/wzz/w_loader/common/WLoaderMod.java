@@ -17,17 +17,18 @@ import net.minecraft.world.level.entity.PersistentEntitySectionManager;
 import java.lang.reflect.Field;
 import java.util.Map;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
 
 @WMod(name = "W Loader", modId = "w_loader")
 public class WLoaderMod {
+    private static boolean setTitle = false;
 
     @Subscribe
     public void onClientTick(ClientTickEvent event) {
         Minecraft mc = Minecraft.getInstance();
-        if (mc.getWindow() != null) {
+        if (mc.getWindow() != null && !setTitle) {
             // 在标题栏彰显 W-Loader 的存在感
             mc.getWindow().setTitle("Minecraft 26.1 - [W-Loader]");
+            setTitle = true;
         }
     }
 
@@ -99,4 +100,3 @@ public class WLoaderMod {
         }
     }
 }
->>>>>>> 597a5d82302d5c8bf8b49710293e8f17d0f53844
