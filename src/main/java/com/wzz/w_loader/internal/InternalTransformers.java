@@ -35,6 +35,9 @@ public final class InternalTransformers {
             "net/minecraft/CrashReport",
             "net/minecraft/client/gui/Gui",
             "net/minecraft/world/entity/item/ItemEntity",
+            "net/minecraft/commands/Commands",
+            "net/minecraft/server/MinecraftServer",
+            "net/minecraft/world/inventory/EnchantmentMenu",
     };
 
     public static void registerAll() {

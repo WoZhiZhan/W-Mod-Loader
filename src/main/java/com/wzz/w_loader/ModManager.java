@@ -66,7 +66,7 @@ public class ModManager {
             JarEntry entry = jf.getJarEntry("mod.json");
             if (entry == null) return null;
             try (InputStream is = jf.getInputStream(entry)) {
-                String json = new String(is.readAllBytes());
+                String json = new String(is.readAllBytes(),java.nio.charset.StandardCharsets.UTF_8);
                 ModMetadata meta = new ModMetadata();
                 meta.name        = extractJson(json, "name");
                 meta.version     = extractJson(json, "version");

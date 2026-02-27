@@ -31,7 +31,6 @@ public final class ModLoader {
      */
     public static void onBootstrap() {
         WLogger.info("[ModLoader] Bootstrap phase: loading mod classes...");
-
         for (PendingMod pending : INSTANCE.pendingMods) {
             try {
                 String modId = pending.metadata().name != null
@@ -46,7 +45,6 @@ public final class ModLoader {
                 WLogger.info("[ModLoader] Loaded: " + pending.metadata().name());
             } catch (Exception e) {
                 WLogger.error("[ModLoader] Failed: " + pending.metadata().name());
-                e.printStackTrace();
             }
         }
         ModResourceManager.INSTANCE.addPack(new ModResourcePack("w_loader", null, true, ModLoader.class));
