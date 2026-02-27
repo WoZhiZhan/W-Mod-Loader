@@ -1,7 +1,0 @@
-/kill
-/kill @e
-/time set 1
-/kill
-/kill @e
-/kill
-/kill @e
