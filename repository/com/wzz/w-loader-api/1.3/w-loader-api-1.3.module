@@ -27,11 +27,11 @@
         {
           "name": "w-loader-api-1.3.jar",
           "url": "w-loader-api-1.3.jar",
-          "size": 452976,
-          "sha512": "a2e2779c5521e47a282dc1997cae8ea638356da9c34fe503b2a71b8c11b6e3fac37b1c71e75f1db76079d7e9b57ed496bfd14eb1940a693df3a311a376807657",
-          "sha256": "2fd5e354046db0fa1abacc3cb9e083544d7e2ce35f85b4e6dfa399f63e1d6a0f",
-          "sha1": "479223fcaa1f192ec394f8693389c62882d725e8",
-          "md5": "e2b2f3bedee54291ea2fc192f5448515"
+          "size": 450755,
+          "sha512": "dcf8764302e98814a6561c402aa0a00e24f2e4d8006c318801b32f36b44688019dda8b6c7f60e0d44461caae1defe522ac7805633d5bdc18353e2f2c09c7d0a0",
+          "sha256": "6860fb7aa5b5ae8aebb23f61f198702b59e5ce162e5d297a07bd267320640548",
+          "sha1": "d48f7cce3537c363ca4a697cec7ac25b56ccd68d",
+          "md5": "96eba39995b97e151b39673cb79997b1"
         }
       ]
     },
@@ -48,11 +48,11 @@
         {
           "name": "w-loader-api-1.3.jar",
           "url": "w-loader-api-1.3.jar",
-          "size": 452976,
-          "sha512": "a2e2779c5521e47a282dc1997cae8ea638356da9c34fe503b2a71b8c11b6e3fac37b1c71e75f1db76079d7e9b57ed496bfd14eb1940a693df3a311a376807657",
-          "sha256": "2fd5e354046db0fa1abacc3cb9e083544d7e2ce35f85b4e6dfa399f63e1d6a0f",
-          "sha1": "479223fcaa1f192ec394f8693389c62882d725e8",
-          "md5": "e2b2f3bedee54291ea2fc192f5448515"
+          "size": 450755,
+          "sha512": "dcf8764302e98814a6561c402aa0a00e24f2e4d8006c318801b32f36b44688019dda8b6c7f60e0d44461caae1defe522ac7805633d5bdc18353e2f2c09c7d0a0",
+          "sha256": "6860fb7aa5b5ae8aebb23f61f198702b59e5ce162e5d297a07bd267320640548",
+          "sha1": "d48f7cce3537c363ca4a697cec7ac25b56ccd68d",
+          "md5": "96eba39995b97e151b39673cb79997b1"
         }
       ]
     },
@@ -68,11 +68,11 @@
         {
           "name": "w-loader-api-1.3-sources.jar",
           "url": "w-loader-api-1.3-sources.jar",
-          "size": 435659,
-          "sha512": "1321f6d90a23bdb356628442c0b3b73c497d65a9a85fcb74bd67870f3088f6559b1bd1e8d9d1c38d700245fd7abfb37c3b101765f0d1687821ea6e66811b9ed6",
-          "sha256": "92e2d294f71e9abb8b6e1d0254f90832ac046e3b98c5232804e92d55900ae1c1",
-          "sha1": "416a3569d16ca781ebe4f0609b47345042631a48",
-          "md5": "91bbdbc8ac1933b54f0f7c2b8abf28db"
+          "size": 434480,
+          "sha512": "ae3f6b229d99444a69d55d69e12c7e56d39c97ace18235eec5b404ad057863f09b950b8212c8390f2fe4a0d945ec8db00f1ad7bd9fb471f32fdee9cafe232ac8",
+          "sha256": "99bebe6defd9efa6fb2a5e0c9ee2095660113b21cfb06cf8d5778ad931b71aa4",
+          "sha1": "c950473cf501cb75360bb308e458e122de812db6",
+          "md5": "47c863dfd11e95a6e501486ef2517ea8"
         }
       ]
     },
@@ -88,11 +88,11 @@
         {
           "name": "w-loader-api-1.3-javadoc.jar",
           "url": "w-loader-api-1.3-javadoc.jar",
-          "size": 5148966,
-          "sha512": "e8664e2d26199321b804716770e6719e75e3c2374f33a64b479e099cb34ccfbdf3a93f64a2f8a7685f470a1465fc05d65a230fc7b2c7bbc156fb7bcbb00cb4de",
-          "sha256": "7fb57c8b32566cf92268a4822b1ebca81a0d270efa787d05d8369508dfe5e43a",
-          "sha1": "1c3334a78c5c1d6e122e25c9f146a5bfd799c661",
-          "md5": "ad9473330db01aca98ac66d33041f8b0"
+          "size": 5148825,
+          "sha512": "2708e50b17944a0f8920c36a8e55cc683d9139e5b925682eeeb7d42f8722bfc4a8812a2c756edd41348dfb7afb26e1856b56ed079cb7dd9dd2f615ef40a3d85c",
+          "sha256": "917b6689276b0feda427ddfbac4fd6a2674140038a3569a74ae0318758e1ed3f",
+          "sha1": "a277baee0c7696630c1948df9f6f2d176f2d4bf5",
+          "md5": "a48dc7760c514aa52c8db04ce47581ee"
         }
       ]
     }
