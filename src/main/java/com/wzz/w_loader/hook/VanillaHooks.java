@@ -924,4 +924,15 @@ public class VanillaHooks {
             ctx.setArg(1, event.getNewLevel());
         }
     }
+
+    @Hook(
+            cls = "net/minecraft/client/renderer/entity/EntityRenderDispatcher",
+            method = "submit",
+            descriptor = "(Lnet/minecraft/client/renderer/entity/state/EntityRenderState;Lnet/minecraft/client/renderer/state/CameraRenderState;DDDLcom/mojang/blaze3d/vertex/PoseStack;Lnet/minecraft/client/renderer/SubmitNodeCollector;)V"
+    )
+    public static void onEntityRender(HookContext ctx) {
+        EntityRenderEvent event = new EntityRenderEvent(ctx.getSelf(), ReflectUtil.getField(ctx.getSelf(), "crosshairPickEntity"), ctx.getArg(1), ctx.getArg(2), ctx.getArg(3),
+                ctx.getArg(4), ctx.getArg(5), ctx.getArg(6), ctx.getArg(7));
+        ctx.post(event);
+    }
 }
