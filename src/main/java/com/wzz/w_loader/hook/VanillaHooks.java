@@ -957,7 +957,7 @@ public class VanillaHooks {
         Commands.CommandSelection environment = ctx.getArg(1);
         CommandBuildContext context = ctx.getArg(2);
         RegisterCommandsEvent event = new RegisterCommandsEvent(dispatcher,environment,context);
-        ctx.post(event);
+        EventBus.INSTANCE.post(event);
     }
 
     @SuppressWarnings("unchecked")
