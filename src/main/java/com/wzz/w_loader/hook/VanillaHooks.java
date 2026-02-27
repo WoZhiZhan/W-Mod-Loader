@@ -1,10 +1,13 @@
 package com.wzz.w_loader.hook;
 
+import com.mojang.brigadier.CommandDispatcher;
 import com.wzz.w_loader.client.screens.widget.InfoTextWidget;
 import com.wzz.w_loader.event.EventBus;
 import com.wzz.w_loader.event.events.*;
 import com.wzz.w_loader.internal.CancelOnlyEvent;
+import com.wzz.w_loader.logger.WLogger;
 import com.wzz.w_loader.resource.ModRepositorySource;
+import com.wzz.w_loader.util.MainThreadScheduler;
 import com.wzz.w_loader.util.ReflectUtil;
 import com.wzz.w_loader.util.WModUtils;
 import net.minecraft.client.gui.Font;
@@ -12,7 +15,10 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.TitleScreen;
 import net.minecraft.client.gui.screens.inventory.tooltip.ClientTooltipComponent;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.commands.CommandBuildContext;
+import net.minecraft.commands.Commands;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.protocol.game.ClientboundEntityEventPacket;
 import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
@@ -22,14 +28,18 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.EnchantmentMenu;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.EnchantmentInstance;
 import net.minecraft.world.level.ExplosionDamageCalculator;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.server.MinecraftServer;
 
+import java.lang.reflect.Field;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -42,6 +52,7 @@ public class VanillaHooks {
             method = "runServer"
     )
     public static void onServerStart(HookContext ctx) {
+        GameLifeCycleHook.server = ctx.getSelf();
         EventBus.INSTANCE.post(new ServerStartingEvent(ctx.getSelf()));
     }
 
@@ -287,6 +298,7 @@ public class VanillaHooks {
             at = HookPoint.Position.TAIL
     )
     public static void onServerTickEnd(HookContext ctx) {
+        MainThreadScheduler.flushPendingTasks();
         EventBus.INSTANCE.post(new ServerTickEvent(ctx.getSelf(), TickEvent.Phase.END));
     }
 
@@ -296,6 +308,7 @@ public class VanillaHooks {
             descriptor = "()V"
     )
     public static void onClientTick(HookContext ctx) {
+        MainThreadScheduler.flushPendingTasks();
         EventBus.INSTANCE.post(new ClientTickEvent(TickEvent.Phase.START));
     }
 
@@ -363,6 +376,18 @@ public class VanillaHooks {
     }
 
     @Hook(
+            cls = "net/minecraft/server/MinecraftServer",
+            method = "stopServer",
+            descriptor = "()V",
+            at = HookPoint.Position.HEAD
+    )
+    public static void onServerClose(HookContext ctx) {
+        MinecraftServer server = ctx.getSelf();
+        ServerStoppingEvent event = new ServerStoppingEvent(server);
+        EventBus.INSTANCE.post(event);
+    }
+
+    @Hook(
             cls = "net/minecraft/server/level/ServerLevel",
             method = "<init>",
             descriptor = "(Lnet/minecraft/server/MinecraftServer;Ljava/util/concurrent/Executor;Lnet/minecraft/world/level/storage/LevelStorageSource$LevelStorageAccess;Lnet/minecraft/world/level/storage/ServerLevelData;Lnet/minecraft/resources/ResourceKey;Lnet/minecraft/world/level/dimension/LevelStem;ZJLjava/util/List;Z)V",
@@ -385,7 +410,6 @@ public class VanillaHooks {
         LevelEvent.Load event = new LevelEvent.Load(level);
         EventBus.INSTANCE.post(event);
     }
-
     @Hook(
             cls = "net/minecraft/world/level/Level",
             method = "close",
@@ -921,7 +945,59 @@ public class VanillaHooks {
         EntitySetLevelEvent event = new EntitySetLevelEvent(ctx.getSelf(), level);
         ctx.post(event);
         if (level != event.getNewLevel()) {
-            ctx.setArg(1, event.getNewLevel());
+            ctx.setArg(1, event.getNewLevel());        }
+    }
+    @Hook(
+            cls = "net/minecraft/commands/Commands",
+            method = "<init>",
+            descriptor = "(Lnet/minecraft/commands/Commands$CommandSelection;Lnet/minecraft/commands/CommandBuildContext;)V",
+            at = HookPoint.Position.TAIL
+    )
+    public static void onCommandReg(HookContext ctx) throws Exception {
+        Field field = ctx.getSelf().getClass().getDeclaredField("dispatcher");
+        field.setAccessible(true);
+        CommandDispatcher dispatcher = (CommandDispatcher) field.get(ctx.getSelf());
+        Commands.CommandSelection environment = ctx.getArg(1);
+        CommandBuildContext context = ctx.getArg(2);
+        RegisterCommandsEvent event = new RegisterCommandsEvent(dispatcher,environment,context);
+        ctx.post(event);
+    }
+    @Hook(
+            cls = "net/minecraft/world/inventory/EnchantmentMenu",
+            method = "getEnchantmentList",
+            descriptor = "(Lnet/minecraft/core/RegistryAccess;Lnet/minecraft/world/item/ItemStack;II)Ljava/util/List;"
+    )
+    public static void onEnchantmentGenerate(HookContext ctx) {
+        RegistryAccess registryAccess = (RegistryAccess) ctx.getArg(0);
+        ItemStack enchantItem = (ItemStack) ctx.getArg(1);
+        int enchantSlot = (int) ctx.getArg(2);
+        int enchantCost = (int) ctx.getArg(3);
+        EnchantmentMenu enchantMenu = (EnchantmentMenu) ctx.getSelf();
+        Player player = null;
+        try {
+            player = ReflectUtil.getField(enchantMenu, "player");
+        } catch (Exception e) {
+            player = null;
+        }
+
+        // 3. 获取原版生成的附魔列表
+        List<EnchantmentInstance> originalEnchantList = (List<EnchantmentInstance>) ctx.getReturnValue();
+
+        // 4. 触发事件（传递 6 个参数，匹配修正后的构造方法，解决参数数量报错）
+        EnchantmentEvent event = new EnchantmentEvent(
+                registryAccess,
+                enchantItem,
+                enchantSlot,
+                enchantCost,
+                originalEnchantList
+        );
+        ctx.post(event);
+
+        // 5. 根据事件结果修改返回值
+        if (ctx.isCancelled()) {
+            ctx.setReturnValue(List.of()); // 取消附魔，返回空列表
+        } else if (event.getModifiedEnchantList() != null) {
+            ctx.setReturnValue(event.getModifiedEnchantList()); // 覆盖附魔列表
         }
     }
 

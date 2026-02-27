@@ -18,8 +18,9 @@ import java.net.URLClassLoader;
 
 public class Bootstrap {
     public static final String version = "1.2";
-
+    private static Instrumentation INSTRUMENTATION;
     public static void premain(String args, Instrumentation instrumentation) {
+        INSTRUMENTATION = instrumentation;
         WLogger.info("========== W Loader Starting ==========");
         instrumentation.addTransformer(new WClassTransformer(), true);
         try (InputStream is = Bootstrap.class.getResourceAsStream("/META-INF/at.cfg")) {
@@ -61,5 +62,8 @@ public class Bootstrap {
             WLogger.error("Failed to register self as mod");
             e.printStackTrace();
         }
+    }
+    public static Instrumentation getINSTRUMENTATION() {
+        return INSTRUMENTATION;
     }
 }

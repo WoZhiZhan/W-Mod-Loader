@@ -58,5 +58,9 @@ public class EventBus {
         return event;
     }
 
+    public void clear() {
+        listeners.clear();
+    }
+
     private record ListenerEntry(Object instance, Method method) {}
 }

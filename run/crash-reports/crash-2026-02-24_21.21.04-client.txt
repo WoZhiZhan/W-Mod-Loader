@@ -1,0 +1,144 @@
+---- Minecraft Crash Report ----
+// Don't be sad, have a hug! <3
+
+Time: 2026-02-24 21:21:04
+Description: Unexpected error
+
+java.lang.IllegalStateException: Missing elements in vertex: UV0, UV2
+	at com.mojang.blaze3d.vertex.BufferBuilder.endLastVertex(BufferBuilder.java:129)
+	at com.mojang.blaze3d.vertex.BufferBuilder.build(BufferBuilder.java:59)
+	at net.minecraft.client.renderer.MultiBufferSource$BufferSource.endBatch(MultiBufferSource.java:90)
+	at net.minecraft.client.renderer.MultiBufferSource$BufferSource.endBatch(MultiBufferSource.java:85)
+	at net.minecraft.client.renderer.MultiBufferSource$BufferSource.getBuffer(MultiBufferSource.java:56)
+	at net.minecraft.client.renderer.feature.ModelFeatureRenderer.renderBatch(ModelFeatureRenderer.java:58)
+	at net.minecraft.client.renderer.feature.ModelFeatureRenderer.renderSolid(ModelFeatureRenderer.java:31)
+	at net.minecraft.client.renderer.feature.FeatureRenderDispatcher.renderSolidFeatures(FeatureRenderDispatcher.java:44)
+	at net.minecraft.client.renderer.LevelRenderer.lambda$addMainPass$0(LevelRenderer.java:673)
+	at com.mojang.blaze3d.framegraph.FrameGraphBuilder.execute(FrameGraphBuilder.java:67)
+	at net.minecraft.client.renderer.LevelRenderer.renderLevel(LevelRenderer.java:546)
+	at net.minecraft.client.renderer.GameRenderer.renderLevel(GameRenderer.java:708)
+	at net.minecraft.client.renderer.GameRenderer.render(GameRenderer.java:429)
+	at net.minecraft.client.Minecraft.renderFrame(Minecraft.java:1381)
+	at net.minecraft.client.Minecraft.runTick(Minecraft.java:1341)
+	at net.minecraft.client.Minecraft.run(Minecraft.java:954)
+	at net.minecraft.client.main.Main.main(Main.java:248)
+
+
+A detailed walkthrough of the error, its code path and all known details is as follows:
+---------------------------------------------------------------------------------------
+
+-- Head --
+Thread: Render thread
+Stacktrace:
+	at com.mojang.blaze3d.vertex.BufferBuilder.endLastVertex(BufferBuilder.java:129)
+	at com.mojang.blaze3d.vertex.BufferBuilder.build(BufferBuilder.java:59)
+	at net.minecraft.client.renderer.MultiBufferSource$BufferSource.endBatch(MultiBufferSource.java:90)
+	at net.minecraft.client.renderer.MultiBufferSource$BufferSource.endBatch(MultiBufferSource.java:85)
+	at net.minecraft.client.renderer.MultiBufferSource$BufferSource.getBuffer(MultiBufferSource.java:56)
+	at net.minecraft.client.renderer.feature.ModelFeatureRenderer.renderBatch(ModelFeatureRenderer.java:58)
+	at net.minecraft.client.renderer.feature.ModelFeatureRenderer.renderSolid(ModelFeatureRenderer.java:31)
+	at net.minecraft.client.renderer.feature.FeatureRenderDispatcher.renderSolidFeatures(FeatureRenderDispatcher.java:44)
+	at net.minecraft.client.renderer.LevelRenderer.lambda$addMainPass$0(LevelRenderer.java:673)
+	at com.mojang.blaze3d.framegraph.FrameGraphBuilder.execute(FrameGraphBuilder.java:67)
+	at net.minecraft.client.renderer.LevelRenderer.renderLevel(LevelRenderer.java:546)
+	at net.minecraft.client.renderer.GameRenderer.renderLevel(GameRenderer.java:708)
+	at net.minecraft.client.renderer.GameRenderer.render(GameRenderer.java:429)
+
+-- Uptime --
+Details:
+	JVM uptime: 14.449s
+	Wall uptime: 9.205s
+	High-res time: 8.810s
+	Client ticks: 148 ticks / 7.400s
+Stacktrace:
+	at net.minecraft.client.Minecraft.fillReport(Minecraft.java:2465)
+	at net.minecraft.client.Minecraft.emergencySaveAndCrash(Minecraft.java:1010)
+	at net.minecraft.client.Minecraft.run(Minecraft.java:978)
+	at net.minecraft.client.main.Main.main(Main.java:248)
+
+-- Affected level --
+Details:
+	All players: 1 total; LocalPlayer{name=TestPlayer, id=8, pos=(0.46117953940202183, -60.0, -6.293476914185716), mode=CREATIVE, permission=owner}
+	Chunk stats: 1521, 117
+	Level dimension: minecraft:overworld
+	Level time: 124 game time, 123 day time
+	Level spawn location: World: (0,-60,0), Section: (at 0,4,0 in 0,-4,0; chunk contains blocks 0,-64,0 to 15,319,15), Region: (0,0; contains chunks 0,0 to 31,31, blocks 0,-64,0 to 511,319,511)
+	Server brand: vanilla
+	Server type: Integrated singleplayer server
+	Tracked entity count: 45
+	Client weather: Raining: false, thundering: false
+
+-- Last reload --
+Details:
+	Reload number: 1
+	Reload reason: initial
+	Finished: Yes
+	Packs: vanilla, w_loader, Forever Love Sword Mod
+
+-- System Details --
+Details:
+	Minecraft Version: 26.1 Snapshot 8
+	Minecraft Version ID: 26.1-snapshot-8
+	Operating System: Windows 10 (amd64) version 10.0
+	Java Version: 25.0.2, Oracle Corporation
+	Java VM Version: OpenJDK 64-Bit Server VM (mixed mode, sharing), Oracle Corporation
+	Memory: 294267688 bytes (280 MiB) / 855638016 bytes (816 MiB) up to 8543797248 bytes (8148 MiB)
+	Memory (heap): init: 512MiB, used: 529MiB, committed: 816MiB, max: 8148MiB
+	Memory (non-head): init: 007MiB, used: 181MiB, committed: 183MiB, max: 000MiB
+	CPUs: 12
+	Processor Vendor: GenuineIntel
+	Processor Name: 12th Gen Intel(R) Core(TM) i5-12490F
+	Identifier: Intel64 Family 6 Model 151 Stepping 2
+	Microarchitecture: Alder Lake
+	Frequency (GHz): 3.00
+	Number of physical packages: 1
+	Number of physical CPUs: 6
+	Number of logical CPUs: 12
+	Graphics card #0 name: NVIDIA GeForce RTX 4060
+	Graphics card #0 vendor: NVIDIA
+	Graphics card #0 VRAM (MiB): 8188.00
+	Graphics card #0 deviceId: VideoController1
+	Graphics card #0 versionInfo: 32.0.15.6094
+	Memory slot #0 capacity (MiB): 16384.00
+	Memory slot #0 clockSpeed (GHz): 3.20
+	Memory slot #0 type: DDR4
+	Memory slot #1 capacity (MiB): 16384.00
+	Memory slot #1 clockSpeed (GHz): 3.20
+	Memory slot #1 type: DDR4
+	Virtual memory max (MiB): 67394.11
+	Virtual memory used (MiB): 22422.61
+	Swap memory total (MiB): 34816.00
+	Swap memory used (MiB): 993.03
+	Space in storage for jna.tmpdir (MiB): <path not set>
+	Space in storage for org.lwjgl.system.SharedLibraryExtractPath (MiB): <path not set>
+	Space in storage for io.netty.native.workdir (MiB): <path not set>
+	Space in storage for java.io.tmpdir (MiB): available: 41891.13, total: 242967.41
+	Space in storage for workdir (MiB): available: 247276.14, total: 334466.31
+	JVM Flags: 0 total; 
+	Debug Flags: 0 total; 
+	Launched Version: 26.1
+	Backend library: LWJGL version 3.4.1+2
+	Backend API: NVIDIA GeForce RTX 4060/PCIe/SSE2 GL version 3.3.0 NVIDIA 560.94, NVIDIA Corporation
+	Window size: 854x480
+	GFLW Platform: win32
+	Render Extensions: GL_ARB_buffer_storage, GL_KHR_debug, GL_ARB_vertex_attrib_binding, GL_ARB_direct_state_access, GL_EXT_texture_filter_anisotropic
+	GL debug messages: 
+	Is Modded: Probably not. Client jar signature and brand is untouched; Server jar signature and brand is untouched
+	Universe: 400921fb54442d18
+	Type: Integrated Server
+	Transparency: regular
+	Render Distance: 16/16 chunks
+	Resource Packs: vanilla, w_loader (incompatible), Forever Love Sword Mod (incompatible)
+	Current Language: en_us
+	Locale: zh_CN
+	System encoding: GBK
+	File encoding: UTF-8
+	CPU: 12x 12th Gen Intel(R) Core(TM) i5-12490F
+	Server Running: true
+	Player Count: 1 / 8; [ServerPlayer['TestPlayer'/8, l='ServerLevel[New World]', x=0.46, y=-60.00, z=-6.29]]
+	Active Data Packs: vanilla, Forever Love Sword Mod (incompatible), w_loader (incompatible)
+	Available Data Packs: Forever Love Sword Mod (incompatible), minecart_improvements, redstone_experiments, trade_rebalance, vanilla, w_loader (incompatible)
+	Enabled Feature Flags: minecraft:vanilla
+	World Generation: Stable
+	World Seed: -5742358787121551147
+	Suppressed Exceptions: ~~NONE~~

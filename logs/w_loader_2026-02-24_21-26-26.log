@@ -1,0 +1,27 @@
+[2026-02-24 21:26:26.487] [INFO] [main] [WLogger] 日志系统初始化成功
+[2026-02-24 21:26:26.488] [INFO] [main] [WLogger] Java版本: 25.0.2
+[2026-02-24 21:26:26.488] [INFO] [main] [WLogger] 操作系统: Windows 10
+[2026-02-24 21:26:26.488] [INFO] [main] [Bootstrap] ========== W Loader Starting ==========
+[2026-02-24 21:26:26.532] [INFO] [main] [Bootstrap] Registered self as mod: W Loader
+[2026-02-24 21:26:26.536] [INFO] [main] [ModManager] [ModManager] Queued: Forever Love Sword Mod
+[2026-02-24 21:26:26.536] [INFO] [main] [Bootstrap] Premain done. Waiting for Minecraft to initialize...
+[2026-02-24 21:26:31.391] [INFO] [main] [ModLoader] [ModLoader] Bootstrap phase: loading mod classes...
+[2026-02-24 21:26:31.394] [DEBUG] [main] [EventBus] Registered HealthDisplayMod#onGuiRenderPost for Post
+[2026-02-24 21:26:31.394] [INFO] [main] [ModLoader] [ModLoader] Loaded: W Loader
+[2026-02-24 21:26:31.396] [DEBUG] [main] [EventBus] Registered ModMain#onServerTick for ServerTickEvent
+[2026-02-24 21:26:31.396] [DEBUG] [main] [EventBus] Registered ModMain#onLivingSetHealth for LivingSetHealthEvent
+[2026-02-24 21:26:31.396] [DEBUG] [main] [EventBus] Registered ModMain#onLivingTick for LivingTickEvent
+[2026-02-24 21:26:31.396] [DEBUG] [main] [EventBus] Registered ModMain#onEntityKill for EntityKillEvent
+[2026-02-24 21:26:31.396] [DEBUG] [main] [EventBus] Registered ModMain#onLivingAttack for LivingAttackEvent
+[2026-02-24 21:26:31.396] [DEBUG] [main] [EventBus] Registered ModMain#onEntityDiscard for EntityDiscardEvent
+[2026-02-24 21:26:31.396] [DEBUG] [main] [EventBus] Registered ModMain#onCreativeTab for CreativeTabEvent
+[2026-02-24 21:26:31.396] [DEBUG] [main] [EventBus] Registered ModMain#onEntityRegisterRenderers for EntityRegisterRenderersEvent
+[2026-02-24 21:26:31.397] [DEBUG] [main] [EventBus] Registered ModMain#onRegister for RegistryEvent
+[2026-02-24 21:26:31.397] [INFO] [main] [ModLoader] [ModLoader] Loaded: Forever Love Sword Mod
+[2026-02-24 21:26:31.402] [INFO] [main] [ModLoader] [ModLoader] Bootstrap phase complete.
+[2026-02-24 21:26:32.441] [DEBUG] [Render thread] [ModRepositorySource] [ModRepositorySource] Loaded pack: Forever Love Sword Mod
+[2026-02-24 21:26:32.444] [DEBUG] [Render thread] [ModRepositorySource] [ModRepositorySource] Loaded pack: w_loader
+[2026-02-24 21:26:55.885] [DEBUG] [Render thread] [ModRepositorySource] [ModRepositorySource] Loaded pack: Forever Love Sword Mod
+[2026-02-24 21:26:55.885] [DEBUG] [Render thread] [ModRepositorySource] [ModRepositorySource] Loaded pack: w_loader
+[2026-02-24 21:26:57.244] [DEBUG] [Render thread] [ModRepositorySource] [ModRepositorySource] Loaded pack: Forever Love Sword Mod
+[2026-02-24 21:26:57.244] [DEBUG] [Render thread] [ModRepositorySource] [ModRepositorySource] Loaded pack: w_loader
